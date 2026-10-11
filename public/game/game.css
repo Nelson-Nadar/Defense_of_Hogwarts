@@ -182,3 +182,68 @@ body {
 /* Keep the laser trail above the selection overlay, without intercepting input. */
 #game { pointer-events: none; }
 body:has(#factionSelect:not(.hidden)) #game { z-index: 11; }
+
+/* Waiting-screen 50/50 layout and scaled presentation */
+#splash:not(.countdown) {
+    display: block;
+    padding: 0;
+    overflow: hidden;
+}
+#splash:not(.countdown) .eyebrow,
+#splash:not(.countdown) h1,
+#splash:not(.countdown) p {
+    position: absolute;
+    left: 3vw;
+    right: 3vw;
+    width: auto;
+    margin: 0;
+    text-align: center;
+}
+#splash:not(.countdown) .eyebrow {
+    top: 12%;
+    font-size: clamp(11.2px, 1.26vw, 18.2px);
+}
+#splash:not(.countdown) h1 {
+    top: 19%;
+    font-size: clamp(50.4px, 7.56vw, 117.6px);
+    line-height: .95;
+}
+#splash:not(.countdown) p {
+    top: 34%;
+    font-size: clamp(23.4px, 2.691vw, 39.6px);
+    margin: 0;
+}
+#splash:not(.countdown) #entityGuide {
+    position: absolute;
+    top: 50%;
+    left: 2vw;
+    right: 2vw;
+    width: 96vw;
+    height: 50%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(4px, .7vh, 8px);
+    overflow: hidden;
+}
+#splash:not(.countdown) #entityGuide .guide-special,
+#splash:not(.countdown) #entityGuide .guide-normal {
+    width: 100%;
+    margin: 0;
+    gap: clamp(4px, .6vw, 9px);
+}
+#splash:not(.countdown) #entityGuide .guide-item {
+    gap: clamp(1px, .6vw, 3px);
+    padding: clamp(0.1px, .6vh, 0.5px) clamp(0.1px, .6vw, 0.5px);
+    font-size: clamp(20px, .75vw, 30px);
+}
+#splash:not(.countdown) #entityGuide .guide-item > img:first-child {
+    width: clamp(100px, 3.6vw, 150px);
+    height: clamp(100px, 3.6vw, 150px);
+}
+#splash:not(.countdown) #entityGuide .guide-item .score-token {
+    width: clamp(100px, 3.92vw, 150px);
+    height: clamp(100px, 2.52vw, 150px);
+}

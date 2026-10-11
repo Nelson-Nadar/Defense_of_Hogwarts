@@ -380,7 +380,7 @@ function resetFactionHover() {
 function updateFactionSelection(now) {
     if (state.phase !== 'selecting' || factionSelectionLocked || !factionHover) return;
     if (now - factionLastLaserAt > 500) { resetFactionHover(); return; }
-    const progress = Math.max(0, Math.min(1, (now - factionHoverSince) / 3000));
+    const progress = Math.max(0, Math.min(1, (now - factionHoverSince) / 1000));
     const option = document.querySelector(`.faction-option[data-faction="${factionHover}"]`);
     if (option) option.querySelector('.faction-progress i').style.width = `${progress * 100}%`;
     if (progress >= 1) {
