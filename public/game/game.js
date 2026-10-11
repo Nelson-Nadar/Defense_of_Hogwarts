@@ -421,10 +421,10 @@ function spawn() {
             : ({
                 'death_eater.svg': 1.2 * 0.9,
                 'dementors.svg': 1.5 * 0.9,
-                'dragon.svg': 2.6 * 0.9,
-                'troll.svg': 1.9 * 0.9,
-                'werewolf.svg': 1.7 * 0.9,
-                'bellatrix.svg': 1.5 * 1.5
+                'Barty_Crouch_Jr.svg': 2.6 * 0.4,
+                'Antonin_Dolohov.svg': 1.9 * 0.5,
+                'Lucious_Malfoy.svg': 1.7 * 0.7,
+                'bellatrix.svg': 1.5 * 1.3
             }[String(entity.asset).split('/').pop()] || 0.9);
 
     objects.push({

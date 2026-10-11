@@ -17,9 +17,9 @@ export const CONFIG = {
         { name: 'dementor', asset: '/assets/entities/dementors.svg', color: '#6f7b98', weight: 50 },
         { name: 'bellatrix', asset: '/assets/entities/bellatrix.svg', color: '#b58bcb', weight: 5 },
         { name: 'death_eater', asset: '/assets/entities/death_eater.svg', color: '#8c8c9b', weight: 11.25 },
-        { name: 'dragon', asset: '/assets/entities/dragon.svg', color: '#c94c42', weight: 11.25 },
-        { name: 'troll', asset: '/assets/entities/troll.svg', color: '#7c9a70', weight: 11.25 },
-        { name: 'werewolf', asset: '/assets/entities/werewolf.svg', color: '#a49b8d', weight: 11.25 }
+        { name: 'barty_crouch_jr', asset: '/assets/entities/Barty_Crouch_Jr.svg', color: '#c94c42', weight: 11.25 },
+        { name: 'antonin_dolohov', asset: '/assets/entities/Antonin_Dolohov.svg', color: '#7c9a70', weight: 11.25 },
+        { name: 'lucious_malfoy', asset: '/assets/entities/Lucious_Malfoy.svg', color: '#a49b8d', weight: 11.25 }
     ],
 
     SPECIAL_ENTITY: { name: 'golden_snitch', asset: '/assets/entities/golden_snitch.svg', color: '#ffe568' },
