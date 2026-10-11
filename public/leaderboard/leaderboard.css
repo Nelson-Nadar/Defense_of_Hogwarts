@@ -516,3 +516,9 @@ h1 {
 .row-player .player-name { min-width: 0; flex: 0 1 auto; overflow-wrap: anywhere; }
 .row-player .faction-logo { width: clamp(24px, 2.8vw, 36px); height: clamp(24px, 2.8vw, 36px); }
 @media (max-width: 520px) { .row-player { gap: 6px; } .row-player .faction-logo { width: 24px; height: 24px; } .player-card > .faction-logo { width: 25px; height: 25px; } }
+
+/* Enlarge only the faction emblems on the first two podium positions. */
+.podium-entry.rank-1 > .faction-logo,
+.podium-entry.rank-1 .player-card > .faction-logo { width: calc(clamp(28px, 3vw, 42px) * 2.7); height: calc(clamp(28px, 3vw, 42px) * 2.7); }
+.podium-entry.rank-2 > .faction-logo,
+.podium-entry.rank-2 .player-card > .faction-logo { width: calc(clamp(28px, 3vw, 42px) * 1.68); height: calc(clamp(28px, 3vw, 42px) * 1.68); }

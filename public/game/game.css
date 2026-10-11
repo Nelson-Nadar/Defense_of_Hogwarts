@@ -141,3 +141,44 @@ body {
 .faction-instructions { position: absolute; z-index: 4; bottom: 10px; left: 50%; transform: translateX(-50%); width: max-content; max-width: 92vw; text-align: center; color: #F1E8D5; font-size: clamp(14px, 1.8vw, 24px); text-shadow: 0 2px 5px #000; }
 @media (max-height: 650px) { #splash { place-content: start center; } #splash h1 { font-size: clamp(32px, 6vh, 60px); } .guide-item { padding: 3px 5px; } .guide-item > img:first-child { width: 26px; height: 26px; } .guide-item .score-token { width: 42px; height: 25px; } }
 @media (max-width: 600px) { .guide-item { gap: 3px; } .guide-normal { gap: 4px; } .faction-option > img { width: clamp(72px, 20vw, 125px); height: clamp(72px, 20vw, 125px); } }
+
+/* Projector-friendly waiting screen and centered countdown */
+#splash:not(.countdown) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(8px, 1.5vh, 20px);
+    padding: clamp(16px, 3vh, 36px) 3vw;
+}
+#splash:not(.countdown) .eyebrow { font-size: clamp(16px, 1.8vw, 26px); }
+#splash:not(.countdown) h1 { font-size: clamp(48px, 7.2vw, 112px); line-height: .95; margin: 0; }
+#splash:not(.countdown) p { margin: 0 0 clamp(8px, 1.5vh, 18px); font-size: clamp(20px, 2.3vw, 34px); }
+#entityGuide { width: min(1500px, 96vw); }
+.guide-special, .guide-normal { gap: clamp(10px, 1.4vw, 22px); }
+.guide-special { margin-bottom: clamp(10px, 1.8vh, 22px); }
+.guide-item { gap: clamp(8px, 1vw, 14px); padding: clamp(8px, 1vh, 14px) clamp(10px, 1vw, 16px); font-size: clamp(14px, 1.25vw, 20px); }
+.guide-item > img:first-child { width: clamp(48px, 5vw, 76px); height: clamp(48px, 5vw, 76px); }
+.guide-item .score-token { width: clamp(66px, 7vw, 100px); height: clamp(40px, 4.5vw, 64px); }
+#splash.countdown { display: flex; align-items: center; justify-content: center; padding: 0; overflow: hidden; }
+#splash.countdown .eyebrow, #splash.countdown p, #splash.countdown #entityGuide { display: none !important; }
+#splash.countdown h1 { margin: 0; width: 100%; text-align: center; font-size: clamp(110px, 24vw, 360px); line-height: 1; }
+@media (max-height: 700px) {
+  #splash:not(.countdown) { gap: 5px; padding: 8px 2vw; }
+  #splash:not(.countdown) h1 { font-size: clamp(40px, 7vh, 76px); }
+  #splash:not(.countdown) p { font-size: clamp(16px, 2.5vh, 24px); margin-bottom: 5px; }
+  .guide-item { padding: 4px 7px; }
+  .guide-item > img:first-child { width: clamp(34px, 5vh, 48px); height: clamp(34px, 5vh, 48px); }
+  .guide-item .score-token { width: clamp(48px, 7vh, 66px); height: clamp(30px, 5vh, 42px); }
+}
+
+/* Follow-up projector sizing refinements */
+#splash:not(.countdown) h1 { font-size: clamp(72px, 10.8vw, 168px); }
+#splash:not(.countdown) p { font-size: clamp(26px, 2.99vw, 44px); }
+#entityGuide .guide-item { padding: clamp(12px, 1.5vh, 21px) clamp(15px, 1.5vw, 24px); gap: clamp(12px, 1.5vw, 21px); font-size: clamp(18px, 1.875vw, 30px); }
+#entityGuide .guide-item > img:first-child { width: clamp(86px, 9vw, 137px); height: clamp(86px, 9vw, 137px); }
+#entityGuide .guide-item .score-token { width: clamp(92px, 9.8vw, 140px); height: clamp(56px, 6.3vw, 90px); }
+.hogwarts-center { width: clamp(91px, 12.6vw, 182px); height: clamp(91px, 12.6vw, 182px); }
+/* Keep the laser trail above the selection overlay, without intercepting input. */
+#game { pointer-events: none; }
+body:has(#factionSelect:not(.hidden)) #game { z-index: 11; }

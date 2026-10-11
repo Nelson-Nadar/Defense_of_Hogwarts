@@ -171,6 +171,7 @@ function screen(old) {
     debug('GAME_STATE', old, '→', state.phase);
 
     if (state.phase === 'countdown' && old !== 'countdown') {
+        $('#splash').classList.add('countdown');
         debug('COUNTDOWN_START');
         $('#entityGuide').classList.add('hidden');
         $('#factionSelect').classList.add('hidden');
@@ -203,9 +204,11 @@ function screen(old) {
         $('#entityGuide').classList.add('hidden');
         s.classList.remove('hidden');
     } else if (state.phase === 'selecting') {
+        s.classList.remove('countdown');
         $('#factionSelect').classList.remove('hidden');
         s.classList.add('hidden');
     } else if (state.phase === 'running') {
+        s.classList.remove('countdown');
         debug('GAME_LOOP_ACTIVE');
         $('#factionSelect').classList.add('hidden');
         $('#entityGuide').classList.add('hidden');
@@ -223,11 +226,12 @@ function screen(old) {
 
         s.classList.remove('hidden');
     } else {
+        s.classList.remove('countdown');
         selectedFaction = null; factionHover = null; factionHoverSince = 0; factionSelectionLocked = false;
         bladeColor = '#9dfff0';
         $('#factionSelect').classList.add('hidden');
         $('#entityGuide').classList.remove('hidden');
-        $('#title').textContent = 'READY TO SLASH?';
+        $('#title').textContent = 'READY TO START?';
         $('#subtitle').textContent = 'Waiting for Admin Signal';
 
         s.classList.remove('hidden');
@@ -291,9 +295,22 @@ function laser(m) {
         factionLastLaserAt = performance.now();
         if (!m.detected || !Number.isFinite(m.x) || !Number.isFinite(m.y) || m.x < 0 || m.x > 1 || m.y < 0 || m.y > 1) {
             resetFactionHover();
+            blade = [];
+            bladePointCount = 0;
             return;
         }
         const x = m.x * cv.width, y = m.y * cv.height;
+        // Reuse the existing Canvas trail during faction selection; no collision checks run here.
+        blade.push({
+            x, y, at: clock,
+            sparkle: bladePointCount++ % 3 === 0 ? {
+                offsetX: (Math.random() - 0.5) * 10,
+                offsetY: (Math.random() - 0.5) * 10,
+                size: 2 + Math.random() * 3,
+                white: Math.random() < 0.16
+            } : null
+        });
+        if (blade.length > 18) blade.shift();
         const candidate = Object.entries(FACTIONS).find(([id, f]) =>
             Math.abs(x - f.x * cv.width) <= cv.width * 0.105 &&
             Math.abs(y - f.y * cv.height) <= cv.height * 0.17
@@ -363,7 +380,7 @@ function resetFactionHover() {
 function updateFactionSelection(now) {
     if (state.phase !== 'selecting' || factionSelectionLocked || !factionHover) return;
     if (now - factionLastLaserAt > 500) { resetFactionHover(); return; }
-    const progress = Math.max(0, Math.min(1, (now - factionHoverSince) / 6000));
+    const progress = Math.max(0, Math.min(1, (now - factionHoverSince) / 3000));
     const option = document.querySelector(`.faction-option[data-faction="${factionHover}"]`);
     if (option) option.querySelector('.faction-progress i').style.width = `${progress * 100}%`;
     if (progress >= 1) {
@@ -583,12 +600,12 @@ function frame(now) {
         const opacity = 1 - fadeProgress;
         const visual = e.visual;
         const scoreImage = e.scoreImage;
-        const visualSize = Math.min(220, Math.max(140, cv.width * 0.11));
+        const visualSize = Math.min(308, Math.max(196, cv.width * 0.154));
         const visualAspect = visual?.naturalWidth > 0 && visual?.naturalHeight > 0
             ? visual.naturalWidth / visual.naturalHeight : 1;
         const visualW = visualSize;
         const visualH = visualSize / visualAspect;
-        const scoreW = Math.min(140, Math.max(90, cv.width * 0.075));
+        const scoreW = Math.min(196, Math.max(126, cv.width * 0.105));
         const scoreAspect = scoreImage?.naturalWidth > 0 && scoreImage?.naturalHeight > 0
             ? scoreImage.naturalWidth / scoreImage.naturalHeight : 1;
         const scoreWActual = scoreW;
@@ -643,7 +660,7 @@ function frame(now) {
 
     // Small four-pointed sparkles are anchored to trail points and fade with them.
     // save/restore isolates sparkle styling from the rest of the Canvas renderer.
-    if (blade.length > 1 && state.phase === 'running' && !gameEnded) {
+    if (blade.length > 1 && ((state.phase === 'running' && !gameEnded) || state.phase === 'selecting')) {
         ctx.save();
         for (let i = 0; i < blade.length; i++) {
             const point = blade[i];
