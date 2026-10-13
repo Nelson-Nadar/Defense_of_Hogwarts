@@ -1,0 +1,32 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Firebase Connection Test</title>
+</head>
+<body>
+  <h1>Firebase Connection Test</h1>
+  <p id="status">Checking configuration...</p>
+
+  <script type="module">
+    import { db } from "/shared/firebase.js";
+    import { ref, get } from
+      "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
+
+    const status = document.getElementById("status");
+
+    try {
+      await get(ref(db, ".info/connected"));
+      status.textContent =
+        "Firebase initialized. Database SDK responded successfully.";
+      console.info("Firebase test completed.");
+    } catch (error) {
+      status.textContent =
+        "Database test failed: " + error.message;
+      console.error(error);
+    }
+  </script>
+</body>
+</html>
