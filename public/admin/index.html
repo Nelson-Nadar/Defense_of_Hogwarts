@@ -35,6 +35,16 @@
                     class="outline hidden">Resume</button><button id="end" class="danger hidden">End
                     Round</button><button id="reset" class="outline">Reset Game</button></div>
         </section>
+        <section class="panel" id="controllerPairing">
+            <div class="eyebrow">Phone controller pairing</div>
+            <p class="status" id="pairingStatus">No controller session prepared.</p>
+            <div class="actions"><button id="prepareController">Prepare Controller / Generate QR</button><button id="endControllerSession" class="outline" disabled>End Pairing Session</button></div>
+            <div id="pairingDetails" class="hidden" style="margin-top:16px">
+                <p><strong>Controller URL</strong></p><p><a id="controllerUrl" href="#" target="_blank" rel="noreferrer"></a></p>
+                <div id="controllerQr" style="background:#fff;display:inline-block;padding:12px;border-radius:8px"></div>
+                <p class="status">The QR code contains the public HTTPS controller URL and this session ID.</p>
+            </div>
+        </section>
         <section class="panel" id="submit">
             <div class="eyebrow">Round result</div>
             <div id="result" class="score">—</div>
@@ -61,6 +71,8 @@
         </form>
     </dialog>
     <script src="/admin/admin.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+    <script type="module" src="/admin/pairing.js"></script>
 </body>
 
 </html>
