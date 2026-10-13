@@ -1,5 +1,5 @@
 import { CONFIG } from '../game/config.js';
-import { TRACKING, detect, normalize } from './controller/tracker.js';
+import { TRACKING, detect, normalize } from './tracker.js';
 
 const video = document.querySelector('#camera');
 const canvas = document.querySelector('#overlay');
