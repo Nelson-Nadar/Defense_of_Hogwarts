@@ -10,23 +10,34 @@
   <h1>Firebase Connection Test</h1>
   <p id="status">Checking configuration...</p>
 
-  <script type="module">
-    import { db } from "/shared/firebase.js";
-    import { ref, get } from
-      "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
+  
+<script type="module">
+  import { db } from "/shared/firebase.js";
+  import {
+    ref,
+    onValue
+  } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
 
-    const status = document.getElementById("status");
+  const status = document.getElementById("status");
 
-    try {
-      await get(ref(db, ".info/connected"));
-      status.textContent =
-        "Firebase initialized. Database SDK responded successfully.";
-      console.info("Firebase test completed.");
-    } catch (error) {
-      status.textContent =
-        "Database test failed: " + error.message;
-      console.error(error);
+  status.textContent = "Connecting to Firebase...";
+
+  onValue(
+    ref(db, ".info/connected"),
+    (snapshot) => {
+      const connected = snapshot.val();
+
+      status.textContent = connected
+        ? "Connected to Firebase Realtime Database."
+        : "Firebase initialized; database is disconnected.";
+
+      console.log("Firebase connected:", connected);
+    },
+    (error) => {
+      status.textContent = "Connection error: " + error.message;
+      console.error("Firebase connection error:", error);
     }
-  </script>
+  );
+</script>
 </body>
 </html>
