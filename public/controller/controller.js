@@ -45,10 +45,10 @@ function connect() {
   ws.onopen = () => {
     ws.send(JSON.stringify({ type: 'hello', role: 'controller' }));
     if (calibrationDirty && points) sendCalibration();
-    $('#connection').textContent = '● Legacy transport open (WebRTC pending)';
+    $('#connection').textContent = '● Connected';
   };
   ws.onclose = () => {
-    $('#connection').textContent = '● Legacy transport reconnecting';
+    $('#connection').textContent = '● Reconnecting';
     setTimeout(connect, 1000);
   };
   ws.onmessage = event => {
