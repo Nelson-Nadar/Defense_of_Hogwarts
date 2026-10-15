@@ -9,7 +9,7 @@ export const CONFIG = {
 
     DIFFICULTY: {
         easy: { interval: 1100, speed: 0.72, max: 4, bomb: 0.09 },
-        medium: { interval: 760, speed: 1, max: 6, bomb: 0.16 },
+        medium: { interval: 760, speed: 1, max: 6, bomb: 0.30 },
         hard: { interval: 520, speed: 1.32, max: 8, bomb: 0.24 }
     },
 

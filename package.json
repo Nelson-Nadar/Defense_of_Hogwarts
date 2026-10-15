@@ -1,7 +1,13 @@
 {
-  "name": "clash-of-wizards",
-  "version": "1.0.0",
+  "name": "defense-of-hogwarts",
+  "version": "3.5.0",
   "private": true,
-  "scripts": { "start": "node server.js", "dev": "node server.js" },
-  "dependencies": { "express": "^4.21.2", "ws": "^8.18.0" }
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "ws": "^8.18.0"
+  }
 }

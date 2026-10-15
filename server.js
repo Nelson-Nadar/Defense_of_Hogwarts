@@ -24,6 +24,7 @@ function syncHighScore() {
 syncHighScore();
 let state = { phase: 'idle', score: 0, lives: 3, bombsHit: 0, duration: 150, difficulty: 'medium', timeLeft: 150, controller: false, calibration: store.calibration || null, completedResult: null, faction: null, trialMode: false };
 let clients = new Set();
+const controllerClients = new Set();
 let pendingEndReason = null;
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -37,7 +38,7 @@ function sanitizeName(n) { return String(n || '').trim().replace(/[^a-zA-Z0-9 ._
 wss.on('connection', ws => {
   clients.add(ws); let role='viewer'; send(ws, snapshot());
   ws.on('message', raw => { let msg; try { msg=JSON.parse(raw); } catch { return; }
-    if (msg.type==='hello') { role=msg.role || role; if(role==='controller') { state.controller=true; broadcast(snapshot()); } return; }
+    if (msg.type==='hello') { role=msg.role || role; if(role==='controller') { controllerClients.add(ws); state.controller=true; broadcast(snapshot()); } return; }
     if (msg.type==='laser' && role==='controller') { if(['selecting','running'].includes(state.phase)) broadcast({type:'laser', detected:!!msg.detected, x:msg.x, y:msg.y, timestamp:msg.timestamp}, ws); return; }
     // The countdown is rendered by the Game client, so only that client can
     // acknowledge its completion. Admin remains the sole controller of all
@@ -48,8 +49,8 @@ wss.on('connection', ws => {
     if (msg.type==='command' && role!=='admin') return;
     if (msg.type==='command') {
       const c=msg.command;
-      if(c==='start' && ['idle','over'].includes(state.phase)) { pendingEndReason=null; state={...state,phase:'selecting',score:0,lives:3,bombsHit:0,timeLeft:msg.duration||150,duration:msg.duration||150,difficulty:msg.difficulty||'medium',completedResult:null,faction:null,trialMode:false}; broadcast(snapshot()); }
-      if(c==='trial' && ['idle','over'].includes(state.phase)) { pendingEndReason=null; state={...state,phase:'selecting',score:0,lives:3,bombsHit:0,timeLeft:30,duration:30,difficulty:msg.difficulty||'medium',completedResult:null,faction:null,trialMode:true}; broadcast(snapshot()); }
+      if(c==='start' && ['idle','over'].includes(state.phase)) { pendingEndReason=null; state={...state,phase:'selecting',score:0,lives:3,bombsHit:0,timeLeft:msg.duration||150,duration:msg.duration||150,difficulty:'medium',completedResult:null,faction:null,trialMode:false}; broadcast(snapshot()); }
+      if(c==='trial' && ['idle','over'].includes(state.phase)) { pendingEndReason=null; state={...state,phase:'selecting',score:0,lives:3,bombsHit:0,timeLeft:30,duration:30,difficulty:'medium',completedResult:null,faction:null,trialMode:true}; broadcast(snapshot()); }
       if(c==='pause' && state.phase==='running') { state.phase='paused'; broadcast(snapshot()); }
       if(c==='resume' && state.phase==='paused') { state.phase='running'; broadcast(snapshot()); }
       if(c==='end' && ['running','paused','countdown','selecting'].includes(state.phase)) { pendingEndReason='ADMIN_ENDED'; broadcast({type:'endGame',reason:'ADMIN_ENDED'}); }
@@ -91,9 +92,34 @@ wss.on('connection', ws => {
       save();
       broadcast(snapshot()); }
   });
-  ws.on('close',()=>{clients.delete(ws);if(role==='controller'){state.controller=false;broadcast(snapshot());}});
+  ws.on('close',()=> {
+    clients.delete(ws);
+    if (role === 'controller') {
+      controllerClients.delete(ws);
+      state.controller = controllerClients.size > 0;
+      // End any in-progress slash so the game cannot retain a stale blade point.
+      broadcast({ type: 'laser', detected: false, timestamp: Date.now() });
+      broadcast(snapshot());
+    }
+  });
 });
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Defense of Hogwarts HTTPS server running on https://${network.HOST_IP}:${PORT}`);
-  console.log(`Laptop access: https://localhost:${PORT}`);
+  const lanBase = `https://(ETHERNET-IPV4):${PORT}`;
+  const localBase = `https://localhost:${PORT}`;
+  const pages = [
+    ['Game', '/game'],
+    ['Admin', '/admin'],
+    ['Leaderboard', '/leaderboard'],
+    ['Camera Controller (Red Tracker)', '/controller'],
+    ['Touch Controller (Touch-Screen)', '/controller/touch.html']
+  ];
+
+  console.log('Defense of Hogwarts HTTPS server started.');
+  console.log('@version 3.5.0');
+  console.log('Release: Added a direct touch-screen controller alongside the existing camera/red-tracker controller.');
+  console.log(`Port: ${PORT}`);
+  console.log('LAN access (replace (ETHERNET-IPV4) with the laptop Ethernet IPv4 address):');
+  for (const [label, route] of pages) console.log(`  ${label}: ${lanBase}${route}`);
+  console.log('Localhost access (on the laptop only):');
+  for (const [label, route] of pages) console.log(`  ${label}: ${localBase}${route}`);
 });

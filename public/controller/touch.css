@@ -1,0 +1,31 @@
+* { box-sizing: border-box; }
+:root { color-scheme: dark; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+html, body { width:100%; height:100%; margin:0; overflow:hidden; background:#0b1026; color:#e8dcc4; overscroll-behavior:none; }
+body { -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
+.controller { width:100%; height:100%; height:100dvh; display:flex; flex-direction:column; padding: max(10px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); gap:10px; }
+.topbar, footer { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-shrink:0; }
+.brand { font-size:clamp(11px, 2.5vw, 15px); font-weight:900; letter-spacing:.16em; color:#d4af37; }
+.connection { display:flex; align-items:center; gap:7px; font-size:12px; font-weight:700; white-space:nowrap; }
+.status-dot { width:8px; height:8px; border-radius:50%; background:#e1a64a; box-shadow:0 0 10px currentColor; }
+.connection.connected { color:#80e0b0; } .connection.connected .status-dot { background:#80e0b0; }
+.connection.disconnected { color:#ff9d8e; } .connection.disconnected .status-dot { background:#ff746b; }
+.touch-surface { position:relative; flex:1; min-height:0; border:1px solid #8f7325; border-radius:18px; background:radial-gradient(ellipse at center, #1b2749 0%, #111a35 54%, #0d142c 100%); display:flex; align-items:center; justify-content:center; overflow:hidden; touch-action:none; }
+.touch-surface:before { content:""; position:absolute; inset:10px; border:1px solid #d4af3728; border-radius:12px; pointer-events:none; }
+.touch-surface.active { background:radial-gradient(ellipse at center, #24375b 0%, #111a35 70%); }
+.surface-content { text-align:center; padding:20px; pointer-events:none; max-width:540px; }
+.wand { color:#d4af37; font-size:clamp(28px, 6vw, 48px); line-height:1; margin-bottom:14px; }
+.surface-content h1 { margin:0; font-size:clamp(22px, 5vw, 42px); letter-spacing:.09em; color:#f3dfaa; }
+.surface-content p { margin:12px auto 0; color:#b8c4dc; font-size:clamp(12px, 2.7vw, 16px); line-height:1.5; }
+.hint { display:block; margin-top:22px; color:#d4af37; font-size:10px; letter-spacing:.18em; font-weight:800; }
+.surface-message { position:absolute; left:0; right:0; bottom:18px; text-align:center; font-size:11px; color:#b8c4dc; pointer-events:none; }
+footer { color:#71809f; font-size:9px; letter-spacing:.14em; font-weight:800; }
+.rotate-notice { display:none; }
+@media (orientation: portrait) {
+  .touch-surface, footer { display:none; }
+  .controller { justify-content:center; }
+  .topbar { position:absolute; top:max(14px, env(safe-area-inset-top)); left:16px; right:16px; }
+  .rotate-notice { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; flex:1; }
+  .rotate-icon { font-size:64px; color:#d4af37; line-height:1; }
+  .rotate-notice h1 { font-size:22px; margin:20px 0 6px; color:#f3dfaa; }
+  .rotate-notice p { margin:0; color:#b8c4dc; font-size:14px; }
+}

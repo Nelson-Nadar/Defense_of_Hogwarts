@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1026">
+  <title>Touch Controller | Defense of Hogwarts</title>
+  <link rel="stylesheet" href="/controller/touch.css">
+</head>
+<body>
+  <main class="controller">
+    <header class="topbar">
+      <div class="brand">DEFENSE OF HOGWARTS</div>
+      <div id="connection" class="connection disconnected" role="status" aria-live="polite">
+        <span class="status-dot"></span><span id="connectionText">Connecting…</span>
+      </div>
+    </header>
+    <section id="rotateNotice" class="rotate-notice" aria-live="polite">
+      <div class="rotate-icon" aria-hidden="true">↻</div>
+      <h1>Rotate Your Device</h1>
+      <p>Turn your phone sideways to begin.</p>
+    </section>
+    <section id="touchSurface" class="touch-surface" aria-label="Touch surface. Swipe to slash">
+      <div class="surface-content" id="surfaceContent">
+        <div class="wand" aria-hidden="true">✦</div>
+        <h1>SWIPE TO SLASH</h1>
+        <p>Move your finger across the screen to control the blade.</p>
+        <span class="hint">KEEP YOUR EYES ON THE GAME</span>
+      </div>
+      <div id="surfaceMessage" class="surface-message">Waiting for connection…</div>
+    </section>
+    <footer><span>LOCAL CONTROLLER</span><span>NO CAMERA REQUIRED</span></footer>
+  </main>
+  <script src="/controller/touch.js" defer></script>
+</body>
+</html>
