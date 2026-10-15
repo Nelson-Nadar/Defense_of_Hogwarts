@@ -104,43 +104,244 @@ body {
     cursor: pointer;
     box-shadow: 0 2px 12px #0008;
 }
+
 #enableAudio:disabled {
     cursor: wait;
     opacity: .85;
 }
+
 #enableAudio.enabled {
     border-color: #8fd8ff;
     color: #8fd8ff;
 }
 
 
-#splash { z-index: 5; padding: 2vh 2vw; overflow: auto; }
-#splash h1 { font-size: clamp(38px, 7vw, 105px); }
-#splash p { margin: .35em 0 .65em; }
-#entityGuide { width: min(1050px, 94vw); margin: 0 auto; color: #F1E8D5; font-family: 'Space Grotesk', sans-serif; text-shadow: 0 1px 3px #000; }
-.guide-special, .guide-normal { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: clamp(7px, 1.2vw, 16px); }
-.guide-special { margin-bottom: 8px; }
-.guide-item { min-width: 0; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 5px 8px; border: 1px solid #D4AF3766; border-radius: 8px; background: #10162dcc; font-size: clamp(10px, 1.1vw, 15px); }
-.guide-item > img:first-child { width: clamp(28px, 3vw, 44px); height: clamp(28px, 3vw, 44px); object-fit: contain; }
-.guide-item .score-token { width: clamp(42px, 5vw, 68px); height: clamp(25px, 3vw, 40px); object-fit: contain; }
-.guide-special .guide-item:first-child { border-color: #F2C94C99; }
-.guide-special .guide-item:nth-child(2) { border-color: #FF537999; }
-#factionSelect { position: fixed; inset: 0; z-index: 10; overflow: hidden; background: #080a18ed; color: #F1E8D5; font-family: 'HARRYP__', sans-serif; }
-.faction-grid-lines { position: absolute; inset: 0; background: linear-gradient(to right, transparent calc(50% - 2px), #D4AF37cc calc(50% - 1px), #D4AF37cc calc(50% + 1px), transparent calc(50% + 2px)), linear-gradient(to bottom, transparent calc(50% - 2px), #D4AF37cc calc(50% - 1px), #D4AF37cc calc(50% + 1px), transparent calc(50% + 2px)); pointer-events: none; }
-.faction-option { position: absolute; width: 50%; height: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(6px, 1.2vh, 14px); isolation: isolate; }
-.faction-option:nth-of-type(2) { left: 0; top: 0; --faction-color: #740001; }
-.faction-option:nth-of-type(3) { left: 50%; top: 0; --faction-color: #1A472A; }
-.faction-option:nth-of-type(4) { left: 0; top: 50%; --faction-color: #ECB939; }
-.faction-option:nth-of-type(5) { left: 50%; top: 50%; --faction-color: #0E1A40; }
-.faction-option > img { position: relative; z-index: 1; width: clamp(95px, 15vw, 230px); height: clamp(95px, 15vw, 230px); object-fit: contain; border: 3px solid var(--faction-color); border-radius: 50%; box-shadow: 0 0 25px color-mix(in srgb, var(--faction-color), transparent 30%); }
-.faction-option > span { z-index: 1; color: var(--faction-color); font-size: clamp(18px, 3vw, 38px); text-shadow: 0 2px 5px #000; }
-.faction-progress { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
-.faction-progress i { display: block; height: 100%; width: 0; background: var(--faction-color); opacity: .5; transition: none; }
-.faction-option.confirmed > img { outline: 5px solid var(--faction-color); }
-.hogwarts-center { position: absolute; z-index: 3; left: 50%; top: 50%; transform: translate(-50%,-50%); width: clamp(65px, 9vw, 130px); height: clamp(65px, 9vw, 130px); object-fit: contain; border: 3px solid #D4AF37; border-radius: 50%; box-shadow: 0 0 20px #D4AF3788; }
-.faction-instructions { position: absolute; z-index: 4; bottom: 10px; left: 50%; transform: translateX(-50%); width: max-content; max-width: 92vw; text-align: center; color: #F1E8D5; font-size: clamp(14px, 1.8vw, 24px); text-shadow: 0 2px 5px #000; }
-@media (max-height: 650px) { #splash { place-content: start center; } #splash h1 { font-size: clamp(32px, 6vh, 60px); } .guide-item { padding: 3px 5px; } .guide-item > img:first-child { width: 26px; height: 26px; } .guide-item .score-token { width: 42px; height: 25px; } }
-@media (max-width: 600px) { .guide-item { gap: 3px; } .guide-normal { gap: 4px; } .faction-option > img { width: clamp(72px, 20vw, 125px); height: clamp(72px, 20vw, 125px); } }
+#splash {
+    z-index: 5;
+    padding: 2vh 2vw;
+    overflow: auto;
+}
+
+#splash h1 {
+    font-size: clamp(38px, 7vw, 105px);
+}
+
+#splash p {
+    margin: .35em 0 .65em;
+}
+
+#entityGuide {
+    width: min(1050px, 94vw);
+    margin: 0 auto;
+    color: #F1E8D5;
+    font-family: 'Space Grotesk', sans-serif;
+    text-shadow: 0 1px 3px #000;
+}
+
+.guide-special,
+.guide-normal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: clamp(7px, 1.2vw, 16px);
+}
+
+.guide-special {
+    margin-bottom: 8px;
+}
+
+.guide-item {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 5px 8px;
+    border: 1px solid #D4AF3766;
+    border-radius: 8px;
+    background: #10162dcc;
+    font-size: clamp(10px, 1.1vw, 15px);
+}
+
+.guide-item>img:first-child {
+    width: clamp(28px, 3vw, 44px);
+    height: clamp(28px, 3vw, 44px);
+    object-fit: contain;
+}
+
+.guide-item .score-token {
+    width: clamp(42px, 5vw, 68px);
+    height: clamp(25px, 3vw, 40px);
+    object-fit: contain;
+}
+
+.guide-special .guide-item:first-child {
+    border-color: #F2C94C99;
+}
+
+.guide-special .guide-item:nth-child(2) {
+    border-color: #FF537999;
+}
+
+#factionSelect {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    overflow: hidden;
+    background: #080a18ed;
+    color: #F1E8D5;
+    font-family: 'HARRYP__', sans-serif;
+}
+
+.faction-grid-lines {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, transparent calc(50% - 2px), #D4AF37cc calc(50% - 1px), #D4AF37cc calc(50% + 1px), transparent calc(50% + 2px)), linear-gradient(to bottom, transparent calc(50% - 2px), #D4AF37cc calc(50% - 1px), #D4AF37cc calc(50% + 1px), transparent calc(50% + 2px));
+    pointer-events: none;
+}
+
+.faction-option {
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(6px, 1.2vh, 14px);
+    isolation: isolate;
+}
+
+.faction-option:nth-of-type(2) {
+    left: 0;
+    top: 0;
+    --faction-color: #740001;
+}
+
+.faction-option:nth-of-type(3) {
+    left: 50%;
+    top: 0;
+    --faction-color: #1A472A;
+}
+
+.faction-option:nth-of-type(4) {
+    left: 0;
+    top: 50%;
+    --faction-color: #ECB939;
+}
+
+.faction-option:nth-of-type(5) {
+    left: 50%;
+    top: 50%;
+    --faction-color: #0E1A40;
+}
+
+.faction-option>img {
+    position: relative;
+    z-index: 1;
+    width: clamp(95px, 15vw, 230px);
+    height: clamp(95px, 15vw, 230px);
+    object-fit: contain;
+    border: 3px solid var(--faction-color);
+    border-radius: 50%;
+    box-shadow: 0 0 25px color-mix(in srgb, var(--faction-color), transparent 30%);
+}
+
+.faction-option>span {
+    z-index: 1;
+    color: var(--faction-color);
+    font-size: clamp(18px, 3vw, 38px);
+    text-shadow: 0 2px 5px #000;
+}
+
+.faction-progress {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.faction-progress i {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--faction-color);
+    opacity: .5;
+    transition: none;
+}
+
+.faction-option.confirmed>img {
+    outline: 5px solid var(--faction-color);
+}
+
+.hogwarts-center {
+    position: absolute;
+    z-index: 3;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: clamp(65px, 9vw, 130px);
+    height: clamp(65px, 9vw, 130px);
+    object-fit: contain;
+    border: 3px solid #D4AF37;
+    border-radius: 50%;
+    box-shadow: 0 0 20px #D4AF3788;
+}
+
+.faction-instructions {
+    position: absolute;
+    z-index: 4;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: max-content;
+    max-width: 92vw;
+    text-align: center;
+    color: #F1E8D5;
+    font-size: clamp(14px, 1.8vw, 24px);
+    text-shadow: 0 2px 5px #000;
+}
+
+@media (max-height: 650px) {
+    #splash {
+        place-content: start center;
+    }
+
+    #splash h1 {
+        font-size: clamp(32px, 6vh, 60px);
+    }
+
+    .guide-item {
+        padding: 3px 5px;
+    }
+
+    .guide-item>img:first-child {
+        width: 26px;
+        height: 26px;
+    }
+
+    .guide-item .score-token {
+        width: 42px;
+        height: 25px;
+    }
+}
+
+@media (max-width: 600px) {
+    .guide-item {
+        gap: 3px;
+    }
+
+    .guide-normal {
+        gap: 4px;
+    }
+
+    .faction-option>img {
+        width: clamp(72px, 20vw, 125px);
+        height: clamp(72px, 20vw, 125px);
+    }
+}
 
 /* Projector-friendly waiting screen and centered countdown */
 #splash:not(.countdown) {
@@ -151,37 +352,141 @@ body {
     gap: clamp(8px, 1.5vh, 20px);
     padding: clamp(16px, 3vh, 36px) 3vw;
 }
-#splash:not(.countdown) .eyebrow { font-size: clamp(16px, 1.8vw, 26px); }
-#splash:not(.countdown) h1 { font-size: clamp(48px, 7.2vw, 112px); line-height: .95; margin: 0; }
-#splash:not(.countdown) p { margin: 0 0 clamp(8px, 1.5vh, 18px); font-size: clamp(20px, 2.3vw, 34px); }
-#entityGuide { width: min(1500px, 96vw); }
-.guide-special, .guide-normal { gap: clamp(10px, 1.4vw, 22px); }
-.guide-special { margin-bottom: clamp(10px, 1.8vh, 22px); }
-.guide-item { gap: clamp(8px, 1vw, 14px); padding: clamp(8px, 1vh, 14px) clamp(10px, 1vw, 16px); font-size: clamp(14px, 1.25vw, 20px); }
-.guide-item > img:first-child { width: clamp(48px, 5vw, 76px); height: clamp(48px, 5vw, 76px); }
-.guide-item .score-token { width: clamp(66px, 7vw, 100px); height: clamp(40px, 4.5vw, 64px); }
-#splash.countdown { display: flex; align-items: center; justify-content: center; padding: 0; overflow: hidden; }
-#splash.countdown .eyebrow, #splash.countdown p, #splash.countdown #entityGuide { display: none !important; }
-#splash.countdown h1 { margin: 0; width: 100%; text-align: center; font-size: clamp(110px, 24vw, 360px); line-height: 1; }
+
+#splash:not(.countdown) .eyebrow {
+    font-size: clamp(16px, 1.8vw, 26px);
+}
+
+#splash:not(.countdown) h1 {
+    font-size: clamp(48px, 7.2vw, 112px);
+    line-height: .95;
+    margin: 0;
+}
+
+#splash:not(.countdown) p {
+    margin: 0 0 clamp(8px, 1.5vh, 18px);
+    font-size: clamp(20px, 2.3vw, 34px);
+}
+
+#entityGuide {
+    width: min(1500px, 96vw);
+}
+
+.guide-special,
+.guide-normal {
+    gap: clamp(10px, 1.4vw, 22px);
+}
+
+.guide-special {
+    margin-bottom: clamp(10px, 1.8vh, 22px);
+}
+
+.guide-item {
+    gap: clamp(8px, 1vw, 14px);
+    padding: clamp(8px, 1vh, 14px) clamp(10px, 1vw, 16px);
+    font-size: clamp(14px, 1.25vw, 20px);
+}
+
+.guide-item>img:first-child {
+    width: clamp(48px, 5vw, 76px);
+    height: clamp(48px, 5vw, 76px);
+}
+
+.guide-item .score-token {
+    width: clamp(66px, 7vw, 100px);
+    height: clamp(40px, 4.5vw, 64px);
+}
+
+#splash.countdown {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    overflow: hidden;
+}
+
+#splash.countdown .eyebrow,
+#splash.countdown p,
+#splash.countdown #entityGuide {
+    display: none !important;
+}
+
+#splash.countdown h1 {
+    margin: 0;
+    width: 100%;
+    text-align: center;
+    font-size: clamp(110px, 24vw, 360px);
+    line-height: 1;
+}
+
 @media (max-height: 700px) {
-  #splash:not(.countdown) { gap: 5px; padding: 8px 2vw; }
-  #splash:not(.countdown) h1 { font-size: clamp(40px, 7vh, 76px); }
-  #splash:not(.countdown) p { font-size: clamp(16px, 2.5vh, 24px); margin-bottom: 5px; }
-  .guide-item { padding: 4px 7px; }
-  .guide-item > img:first-child { width: clamp(34px, 5vh, 48px); height: clamp(34px, 5vh, 48px); }
-  .guide-item .score-token { width: clamp(48px, 7vh, 66px); height: clamp(30px, 5vh, 42px); }
+    #splash:not(.countdown) {
+        gap: 5px;
+        padding: 8px 2vw;
+    }
+
+    #splash:not(.countdown) h1 {
+        font-size: clamp(40px, 7vh, 76px);
+    }
+
+    #splash:not(.countdown) p {
+        font-size: clamp(16px, 2.5vh, 24px);
+        margin-bottom: 5px;
+    }
+
+    .guide-item {
+        padding: 4px 7px;
+    }
+
+    .guide-item>img:first-child {
+        width: clamp(34px, 5vh, 48px);
+        height: clamp(34px, 5vh, 48px);
+    }
+
+    .guide-item .score-token {
+        width: clamp(48px, 7vh, 66px);
+        height: clamp(30px, 5vh, 42px);
+    }
 }
 
 /* Follow-up projector sizing refinements */
-#splash:not(.countdown) h1 { font-size: clamp(72px, 10.8vw, 168px); }
-#splash:not(.countdown) p { font-size: clamp(26px, 2.99vw, 44px); }
-#entityGuide .guide-item { padding: clamp(12px, 1.5vh, 21px) clamp(15px, 1.5vw, 24px); gap: clamp(12px, 1.5vw, 21px); font-size: clamp(18px, 1.875vw, 30px); }
-#entityGuide .guide-item > img:first-child { width: clamp(86px, 9vw, 137px); height: clamp(86px, 9vw, 137px); }
-#entityGuide .guide-item .score-token { width: clamp(92px, 9.8vw, 140px); height: clamp(56px, 6.3vw, 90px); }
-.hogwarts-center { width: clamp(91px, 12.6vw, 182px); height: clamp(91px, 12.6vw, 182px); }
+#splash:not(.countdown) h1 {
+    font-size: clamp(72px, 10.8vw, 168px);
+}
+
+#splash:not(.countdown) p {
+    font-size: clamp(26px, 2.99vw, 44px);
+}
+
+#entityGuide .guide-item {
+    padding: clamp(12px, 1.5vh, 21px) clamp(15px, 1.5vw, 24px);
+    gap: clamp(12px, 1.5vw, 21px);
+    font-size: clamp(18px, 1.875vw, 30px);
+}
+
+#entityGuide .guide-item>img:first-child {
+    width: clamp(86px, 9vw, 137px);
+    height: clamp(86px, 9vw, 137px);
+}
+
+#entityGuide .guide-item .score-token {
+    width: clamp(92px, 9.8vw, 140px);
+    height: clamp(56px, 6.3vw, 90px);
+}
+
+.hogwarts-center {
+    width: clamp(91px, 12.6vw, 182px);
+    height: clamp(91px, 12.6vw, 182px);
+}
+
 /* Keep the laser trail above the selection overlay, without intercepting input. */
-#game { pointer-events: none; }
-body:has(#factionSelect:not(.hidden)) #game { z-index: 11; }
+#game {
+    pointer-events: none;
+}
+
+body:has(#factionSelect:not(.hidden)) #game {
+    z-index: 11;
+}
 
 /* Waiting-screen 50/50 layout and scaled presentation */
 #splash:not(.countdown) {
@@ -189,6 +494,7 @@ body:has(#factionSelect:not(.hidden)) #game { z-index: 11; }
     padding: 0;
     overflow: hidden;
 }
+
 #splash:not(.countdown) .eyebrow,
 #splash:not(.countdown) h1,
 #splash:not(.countdown) p {
@@ -199,20 +505,24 @@ body:has(#factionSelect:not(.hidden)) #game { z-index: 11; }
     margin: 0;
     text-align: center;
 }
+
 #splash:not(.countdown) .eyebrow {
     top: 12%;
     font-size: clamp(11.2px, 1.26vw, 18.2px);
 }
+
 #splash:not(.countdown) h1 {
-    top: 19%;
+    top: 30%;
     font-size: clamp(50.4px, 7.56vw, 117.6px);
     line-height: .95;
 }
+
 #splash:not(.countdown) p {
-    top: 34%;
+    top: 48%;
     font-size: clamp(23.4px, 2.691vw, 39.6px);
     margin: 0;
 }
+
 #splash:not(.countdown) #entityGuide {
     position: absolute;
     top: 50%;
@@ -228,22 +538,38 @@ body:has(#factionSelect:not(.hidden)) #game { z-index: 11; }
     gap: clamp(4px, .7vh, 8px);
     overflow: hidden;
 }
+
 #splash:not(.countdown) #entityGuide .guide-special,
 #splash:not(.countdown) #entityGuide .guide-normal {
     width: 100%;
     margin: 0;
     gap: clamp(4px, .6vw, 9px);
 }
+
 #splash:not(.countdown) #entityGuide .guide-item {
     gap: clamp(1px, .6vw, 3px);
     padding: clamp(0.1px, .6vh, 0.5px) clamp(0.1px, .6vw, 0.5px);
     font-size: clamp(20px, .75vw, 30px);
 }
-#splash:not(.countdown) #entityGuide .guide-item > img:first-child {
+
+#splash:not(.countdown) #entityGuide .guide-item>img:first-child {
     width: clamp(100px, 3.6vw, 150px);
     height: clamp(100px, 3.6vw, 150px);
 }
+
 #splash:not(.countdown) #entityGuide .guide-item .score-token {
     width: clamp(100px, 3.92vw, 150px);
     height: clamp(100px, 2.52vw, 150px);
+}
+
+#splash {
+    justify-items: center;
+}
+
+#splash #outcomeMessage {
+    width: min(90vw, 850px);
+    margin: 60px auto 0;
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
 }

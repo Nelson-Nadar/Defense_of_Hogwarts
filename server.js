@@ -22,7 +22,7 @@ function syncHighScore() {
   store.highScore = store.leaderboard.reduce((highest, record) => Math.max(highest, Number(record.score) || 0), 0);
 }
 syncHighScore();
-let state = { phase: 'idle', score: 0, lives: 3, bombsHit: 0, duration: 150, difficulty: 'medium', timeLeft: 150, controller: false, calibration: store.calibration || null, completedResult: null, faction: null };
+let state = { phase: 'idle', score: 0, lives: 3, bombsHit: 0, duration: 150, difficulty: 'medium', timeLeft: 150, controller: false, calibration: store.calibration || null, completedResult: null, faction: null, trialMode: false };
 let clients = new Set();
 let pendingEndReason = null;
 
@@ -48,14 +48,16 @@ wss.on('connection', ws => {
     if (msg.type==='command' && role!=='admin') return;
     if (msg.type==='command') {
       const c=msg.command;
-      if(c==='start' && ['idle','over'].includes(state.phase)) { pendingEndReason=null; state={...state,phase:'selecting',score:0,lives:3,bombsHit:0,timeLeft:msg.duration||150,duration:msg.duration||150,difficulty:msg.difficulty||'medium',completedResult:null,faction:null}; broadcast(snapshot()); }
+      if(c==='start' && ['idle','over'].includes(state.phase)) { pendingEndReason=null; state={...state,phase:'selecting',score:0,lives:3,bombsHit:0,timeLeft:msg.duration||150,duration:msg.duration||150,difficulty:msg.difficulty||'medium',completedResult:null,faction:null,trialMode:false}; broadcast(snapshot()); }
+      if(c==='trial' && ['idle','over'].includes(state.phase)) { pendingEndReason=null; state={...state,phase:'selecting',score:0,lives:3,bombsHit:0,timeLeft:30,duration:30,difficulty:msg.difficulty||'medium',completedResult:null,faction:null,trialMode:true}; broadcast(snapshot()); }
       if(c==='pause' && state.phase==='running') { state.phase='paused'; broadcast(snapshot()); }
       if(c==='resume' && state.phase==='paused') { state.phase='running'; broadcast(snapshot()); }
       if(c==='end' && ['running','paused','countdown','selecting'].includes(state.phase)) { pendingEndReason='ADMIN_ENDED'; broadcast({type:'endGame',reason:'ADMIN_ENDED'}); }
-      if(c==='reset') { pendingEndReason=null; state={...state,phase:'idle',score:0,lives:3,bombsHit:0,timeLeft:state.duration,completedResult:null,faction:null}; broadcast(snapshot()); }
+      if(c==='reset') { pendingEndReason=null; state={...state,phase:'idle',score:0,lives:3,bombsHit:0,timeLeft:state.duration,completedResult:null,faction:null,trialMode:false}; broadcast(snapshot()); }
       return;
     }
-    if(msg.type==='gameUpdate' && role==='game' && ['running','paused'].includes(state.phase)) {
+    if(msg.type==='trialComplete' && role==='game' && state.trialMode && ['running','paused'].includes(state.phase)) { pendingEndReason=null; state={...state,phase:'idle',score:0,lives:3,bombsHit:0,timeLeft:state.duration,completedResult:null,faction:null,trialMode:false}; broadcast(snapshot()); return; }
+    if(msg.type==='gameUpdate' && role==='game' && !state.trialMode && ['running','paused'].includes(state.phase)) {
       state.score=Math.max(0,Number(msg.score)||0);
       state.lives=Math.max(0,Number(msg.lives)||0);
       state.bombsHit=Math.max(0,Number(msg.bombsHit)||0);
@@ -63,7 +65,7 @@ wss.on('connection', ws => {
       broadcast(snapshot());
       return;
     }
-    if(msg.type==='gameComplete' && role==='game' && ['running','paused','countdown','selecting'].includes(state.phase)) {
+    if(msg.type==='gameComplete' && role==='game' && !state.trialMode && ['running','paused','countdown','selecting'].includes(state.phase)) {
       const score=Math.max(0,Number(msg.score)||0);
       const highestScore=Math.max(score, store.highScore || 0);
       const livesRemaining=Math.max(0,Number(msg.livesRemaining)||0);

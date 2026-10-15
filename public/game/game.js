@@ -1,3 +1,4 @@
+
 import { CONFIG } from './config.js';
 import { segmentCircle } from './collision.js';
 
@@ -128,8 +129,9 @@ $('#enableAudio')?.addEventListener('click', unlockAudio);
 });
 
 let bladeColor = '#9dfff0';
-let ws, state = { phase: 'idle', timeLeft: 150 }, objects = [], effects = [], blade = [], bladePointCount = 0, prev = null, score = 0, lives = 3, bombs = 0, last = performance.now(), clock = 0, nextSpawn = 0, lastReport = 0, firstRunningFrame = true, gameEnded = false, countdownTimer = null;
-const FACTIONS = { gryffindor: { color: '#740001', x: 0.25, y: 0.25 }, slytherin: { color: '#1A472A', x: 0.75, y: 0.25 }, hufflepuff: { color: '#ECB939', x: 0.25, y: 0.75 }, ravenclaw: { color: '#0E1A40', x: 0.75, y: 0.75 } };
+let ws, state = { phase: 'idle', timeLeft: 150 }, objects = [], effects = [], blade = [], magicParticles = [], bladePointCount = 0, prev = null, score = 0, lives = 3, bombs = 0, last = performance.now(), clock = 0, nextSpawn = 0, lastReport = 0, firstRunningFrame = true, gameEnded = false, countdownTimer = null;
+const FACTIONS = { gryffindor: { color: '#740001', x: 0.25, y: 0.25 }, slytherin: { color: '#008546', x: 0.75, y: 0.25 }, hufflepuff: { color: '#ECB939', x: 0.25, y: 0.75 }, ravenclaw: { color: '#405B91', x: 0.75, y: 0.75 } };
+let trialStartedAt = null;
 let selectedFaction = null, factionHover = null, factionHoverSince = 0, factionLastLaserAt = 0, factionSelectionLocked = false;
 
 const debug = (...details) => {
@@ -221,14 +223,22 @@ function screen(old) {
         $('#title').textContent = 'GAME OVER';
 
         const reason = state.completedResult?.gameEndReason || 'ROUND COMPLETE';
-
         $('#subtitle').textContent = `${score.toLocaleString()} POINTS · DOBBY HITS: ${bombs} · ${reason} · WAITING FOR ADMIN`;
 
+        $('#outcomeMessage').classList.add('hidden');
+        const outcome = reason === 'TIME' ? 'Hogwarts was successfully defended, the Dark Lord has been defeated.' : reason === 'LIVES_DEPLETED' ? 'Hogwarts was overrun by the Dark Forces, Voldemort has taken over Hogwarts.' : '';
+        $('#outcomeMessage').textContent = outcome;
+        $('#outcomeMessage').classList.toggle('hidden', !outcome);
         s.classList.remove('hidden');
     } else {
+        $('#outcomeMessage').classList.add('hidden');
         s.classList.remove('countdown');
-        selectedFaction = null; factionHover = null; factionHoverSince = 0; factionSelectionLocked = false;
-        bladeColor = '#9dfff0';
+        selectedFaction = null;
+        factionHover = null;
+        factionHoverSince = 0;
+        factionSelectionLocked = false;
+        bladeColor = '#9DFFF0';
+        trialStartedAt = null;
         $('#factionSelect').classList.add('hidden');
         $('#entityGuide').classList.remove('hidden');
         $('#title').textContent = 'READY TO START?';
@@ -239,6 +249,7 @@ function screen(old) {
         objects = [];
         effects = [];
         blade = [];
+        magicParticles = [];
         bladePointCount = 0;
         prev = null;
         score = 0;
@@ -290,6 +301,116 @@ function endGame(reason) {
     screen('running');
 }
 
+
+// SUBTLE MAGIC TRAIL: soft ribbon and a restrained sparkle drift.
+// Particle rendering is cosmetic only; it never participates in collision detection.
+function emitMagicParticles(x, y) {
+  for (let i = 0; i < 2 + Math.random() * 2; i++) {
+    const life = 1 + Math.random() * 0.2;
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 15 + Math.random() * 35;
+
+    magicParticles.push({
+      x,
+      y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 5,
+      size: 6 + Math.random() * 1.5,
+      life,
+      maxLife: life,
+      gravity: 12 + Math.random() * 10,
+      twinkle: Math.random() * Math.PI * 2
+    });
+  }
+
+  // Hard cap to prevent excessive particle buildup
+  if (magicParticles.length > 300) {
+    magicParticles.splice(0, magicParticles.length - 120);
+  }
+}
+
+function drawSmoothBladeTrail() {
+    if (blade.length < 2) return;
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    // Quadratic midpoint curves smooth the path instead of drawing visible straight segments.
+    const drawCurve = () => {
+        ctx.beginPath();
+        ctx.moveTo(blade[0].x, blade[0].y);
+        for (let i = 1; i < blade.length - 1; i++) {
+            const midX = (blade[i].x + blade[i + 1].x) / 2;
+            const midY = (blade[i].y + blade[i + 1].y) / 2;
+            ctx.quadraticCurveTo(blade[i].x, blade[i].y, midX, midY);
+        }
+        const lastPoint = blade[blade.length - 1];
+        ctx.lineTo(lastPoint.x, lastPoint.y);
+        ctx.stroke();
+    };
+
+    // Wide, soft colored aura.
+    ctx.globalAlpha = 0.22;
+    ctx.strokeStyle = bladeColor;
+    ctx.lineWidth = 20;
+    ctx.shadowColor = bladeColor;
+    ctx.shadowBlur = 15;
+    drawCurve();
+
+    // Bright, narrow center line.
+    ctx.globalAlpha = 0.92;
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 7;
+    ctx.shadowColor = bladeColor;
+    ctx.shadowBlur = 15;
+    drawCurve();
+    ctx.restore();
+}
+
+function drawMagicParticles(dt) {
+  for (let i = magicParticles.length - 1; i >= 0; i--) {
+    const p = magicParticles[i];
+
+    p.life -= dt;
+
+    if (p.life <= 0) {
+      magicParticles.splice(i, 1);
+      continue;
+    }
+
+    // Subtle downward drift
+    p.vy += p.gravity * dt;
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+
+    // Gradually reduce horizontal movement
+    p.vx *= Math.pow(0.97, dt * 60);
+
+    const progress = p.life / p.maxLife;
+    const fade = progress * progress;
+    const radius = p.size * (0.7 + progress * 0.3);
+
+    ctx.save();
+    ctx.globalAlpha = fade;
+    ctx.globalCompositeOperation = 'lighter';
+
+    // Colored particle — no expensive shadow blur
+    ctx.fillStyle = bladeColor;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Tiny bright center
+    ctx.globalAlpha = fade * 0.7;
+    ctx.fillStyle = '#FFFFFF';
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, radius * 0.35, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+}
+
 function laser(m) {
     if (state.phase === 'selecting' && !factionSelectionLocked && !gameEnded) {
         factionLastLaserAt = performance.now();
@@ -310,12 +431,16 @@ function laser(m) {
                 white: Math.random() < 0.16
             } : null
         });
-        if (blade.length > 18) blade.shift();
+        if (blade.length > 5) blade.shift();
+        emitMagicParticles(x, y);
         const candidate = Object.entries(FACTIONS).find(([id, f]) =>
             Math.abs(x - f.x * cv.width) <= cv.width * 0.105 &&
             Math.abs(y - f.y * cv.height) <= cv.height * 0.17
         );
-        if (!candidate) { resetFactionHover(); return; }
+        if (!candidate) {
+            resetFactionHover();
+            return;
+        }
         if (factionHover !== candidate[0]) {
             resetFactionHover();
             factionHover = candidate[0];
@@ -323,6 +448,7 @@ function laser(m) {
         }
         return;
     }
+
     if (gameEnded || state.phase !== 'running') {
         prev = null;
         blade = [];
@@ -366,6 +492,7 @@ function laser(m) {
     });
 
     if (blade.length > 18) blade.shift();
+    emitMagicParticles(p.x, p.y);
 }
 
 function resetFactionHover() {
@@ -379,14 +506,19 @@ function resetFactionHover() {
 
 function updateFactionSelection(now) {
     if (state.phase !== 'selecting' || factionSelectionLocked || !factionHover) return;
-    if (now - factionLastLaserAt > 500) { resetFactionHover(); return; }
+    if (now - factionLastLaserAt > 500) {
+        resetFactionHover();
+        return;
+    }
+
     const progress = Math.max(0, Math.min(1, (now - factionHoverSince) / 1000));
     const option = document.querySelector(`.faction-option[data-faction="${factionHover}"]`);
     if (option) option.querySelector('.faction-progress i').style.width = `${progress * 100}%`;
+
     if (progress >= 1) {
         selectedFaction = factionHover;
         factionSelectionLocked = true;
-        bladeColor = FACTIONS[selectedFaction].color;
+        bladeColor = state.trialMode ? '#9DFFF0' : FACTIONS[selectedFaction].color;
         if (option) option.classList.add('confirmed');
         debug('FACTION_CONFIRMED', selectedFaction);
         ws?.send(JSON.stringify({ type: 'factionSelected', faction: selectedFaction }));
@@ -401,6 +533,7 @@ function spawn() {
     let bomb = Math.random() < d.bomb;
     let star = !bomb && Math.random() < 0.08;
     let entity = null;
+
     if (!bomb && !star) {
         const roll = Math.random() * 100;
         let cumulative = 0;
@@ -409,7 +542,10 @@ function spawn() {
             return roll < cumulative;
         }) || CONFIG.ENTITIES[CONFIG.ENTITIES.length - 1];
     }
+
     let top = Math.random() < 0.2;
+    const isDobby = bomb;
+    if (isDobby) top = false;
 
     // Final fine-tuning relative to the v3 entity sizes.
     // All regular entities except Bellatrix are reduced by 10%.
@@ -428,11 +564,16 @@ function spawn() {
             }[String(entity.asset).split('/').pop()] || 0.9);
 
     objects.push({
-        x: Math.random() * cv.width,
-        y: top ? -55 : cv.height + 55,
+        x: isDobby ? (Math.random() < 0.5 ? -55 : cv.width + 55) : Math.random() * cv.width,
+        y: isDobby ? cv.height * (0.25 + Math.random() * 0.45) : top ? -55 : cv.height + 55,
+        dobby: isDobby,
+        age: 0,
+        baseY: isDobby ? cv.height * (0.25 + Math.random() * 0.45) : 0,
+        trail: [],
+        direction: isDobby ? (Math.random() < 0.5 ? 1 : -1) : 0,
 
-        vx: (Math.random() - 0.5) * 300 * d.speed,
-        vy: top
+        vx: isDobby ? (Math.random() < 0.5 ? 1 : -1) * (220 + Math.random() * 80) * d.speed : (Math.random() - 0.5) * 300 * d.speed,
+        vy: isDobby ? 0 : top
             ? 70
             : -(650 + Math.random() * 250) * d.speed,
 
@@ -465,7 +606,9 @@ function hit(o, hitPosition = { x: o.x, y: o.y }) {
     const category = o.type === 'bomb' ? 'penalty' : o.type === 'star' ? 'bonus' : 'hit';
     const assets = hitEffectAssets[category];
 
-    if (o.type === 'bomb') {
+    if (state.trialMode) {
+        // Trial hits show visual/audio feedback but never alter real score or lives.
+    } else if (o.type === 'bomb') {
         score = Math.max(0, score + CONFIG.SCORES.bomb);
         lives--;
         bombs++;
@@ -483,9 +626,10 @@ function hit(o, hitPosition = { x: o.x, y: o.y }) {
         createdAt: performance.now(),
         duration: EFFECT_LIFETIME_MS
     });
+
     playAudio(assets.audioPool);
 
-    if (lives <= 0) endGame('LIVES_DEPLETED');
+    if (!state.trialMode && lives <= 0) endGame('LIVES_DEPLETED');
 }
 
 function report(time = state.timeLeft) {
@@ -545,30 +689,71 @@ function frame(now) {
 
         state.timeLeft -= dt;
 
+        if (state.trialMode) {
+            if (trialStartedAt === null) trialStartedAt = now;
+            state.timeLeft = Math.max(0, 30 - (now - trialStartedAt) / 1000);
+
+            if (state.timeLeft <= 0) {
+                ws?.send(JSON.stringify({ type: 'trialComplete' }));
+                state = { ...state, phase: 'idle', trialMode: false };
+                trialStartedAt = null;
+                objects = [];
+                effects = [];
+                blade = [];
+                magicParticles = [];
+                bladePointCount = 0;
+                prev = null;
+                score = 0;
+                lives = 3;
+                bombs = 0;
+                gameEnded = false;
+                screen('running');
+                return;
+            }
+        }
+
         let d = CONFIG.DIFFICULTY[state.difficulty] || CONFIG.DIFFICULTY.medium;
 
         if (clock > nextSpawn) {
             debug('SPAWN_ATTEMPT');
-
             spawn();
-
             nextSpawn = clock + d.interval;
         }
 
         objects.forEach(o => {
             try {
                 o.x += o.vx * dt;
-                o.y += o.vy * dt;
-                o.vy += 650 * dt;
-                o.rot += o.spin * dt;
 
+                if (o.dobby) {
+                    o.age += dt;
+                    o.y = o.baseY + Math.sin(o.age * 2.5) * 65;
+                    o.trail.push({ x: o.x, y: o.y, at: now });
+                    if (o.trail.length > 50) o.trail.shift();
+                    if (o.x < -80 || o.x > cv.width + 80) o.dead = true;
+
+                    ctx.save();
+                    ctx.lineCap = 'round';
+
+                    for (let i = 1; i < o.trail.length; i++) {
+                        ctx.globalAlpha = i / o.trail.length * 0.65;
+                        ctx.strokeStyle = '#ff3030';
+                        ctx.lineWidth = 7 + i * 0.35;
+                        ctx.beginPath();
+                        ctx.moveTo(o.trail[i - 1].x, o.trail[i - 1].y);
+                        ctx.lineTo(o.trail[i].x, o.trail[i].y);
+                        ctx.stroke();
+                    }
+
+                    ctx.restore();
+                } else {
+                    o.y += o.vy * dt;
+                    o.vy += 650 * dt;
+                }
+
+                o.rot += o.spin * dt;
                 draw(o);
             } catch (error) {
-                console.error(
-                    'Unable to render game object:',
-                    error
-                );
-
+                console.error('Unable to render game object:', error);
                 o.dead = true;
             }
         });
@@ -592,6 +777,7 @@ function frame(now) {
     }
 
     effects = effects.filter(e => now - e.createdAt < e.duration);
+
     effects.forEach(e => {
         const elapsed = Math.max(0, now - e.createdAt);
         const fadeProgress = Math.max(0, Math.min(1,
@@ -615,10 +801,12 @@ function frame(now) {
         let visualY = e.y - visualH / 2;
         let scoreX = e.x + visualW / 2 + gap;
         let scoreY = e.y - scoreH / 2;
+
         // Keep the paired graphics near the hit while avoiding unnecessary screen-edge clipping.
         if (scoreX + scoreWActual > cv.width - 6) {
             scoreX = e.x - visualW / 2 - gap - scoreWActual;
         }
+
         visualX = Math.max(0, Math.min(cv.width - visualW, visualX));
         visualY = Math.max(0, Math.min(cv.height - visualH, visualY));
         scoreX = Math.max(0, Math.min(cv.width - scoreWActual, scoreX));
@@ -626,42 +814,27 @@ function frame(now) {
 
         ctx.save();
         ctx.globalAlpha = opacity;
+
         if (visual?.complete && visual.naturalWidth > 0) {
             ctx.drawImage(visual, visualX, visualY, visualW, visualH);
         }
+
         if (scoreImage?.complete && scoreImage.naturalWidth > 0) {
             ctx.drawImage(scoreImage, scoreX, scoreY, scoreWActual, scoreH);
         }
+
         ctx.restore();
     });
 
-    if (blade.length > 1) {
-        ctx.lineCap = 'round';
-
-        for (let i = 1; i < blade.length; i++) {
-            ctx.globalAlpha = i / blade.length;
-            ctx.strokeStyle = bladeColor;
-            ctx.lineWidth = 4 + i * 1.5;
-
-            ctx.beginPath();
-            ctx.moveTo(
-                blade[i - 1].x,
-                blade[i - 1].y
-            );
-            ctx.lineTo(
-                blade[i].x,
-                blade[i].y
-            );
-            ctx.stroke();
-        }
-
-        ctx.globalAlpha = 1;
-    }
+    // Smooth, luminous ribbon replaces the segmented Canvas line.
+    drawSmoothBladeTrail();
+    drawMagicParticles(dt);
 
     // Small four-pointed sparkles are anchored to trail points and fade with them.
     // save/restore isolates sparkle styling from the rest of the Canvas renderer.
     if (blade.length > 1 && ((state.phase === 'running' && !gameEnded) || state.phase === 'selecting')) {
         ctx.save();
+
         for (let i = 0; i < blade.length; i++) {
             const point = blade[i];
             if (!point.sparkle) continue;
@@ -684,6 +857,7 @@ function frame(now) {
             ctx.closePath();
             ctx.fill();
         }
+
         ctx.restore();
     }
 

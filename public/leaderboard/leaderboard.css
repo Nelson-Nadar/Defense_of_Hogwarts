@@ -522,3 +522,291 @@ h1 {
 .podium-entry.rank-1 .player-card > .faction-logo { width: calc(clamp(28px, 3vw, 42px) * 2.7); height: calc(clamp(28px, 3vw, 42px) * 2.7); }
 .podium-entry.rank-2 > .faction-logo,
 .podium-entry.rank-2 .player-card > .faction-logo { width: calc(clamp(28px, 3vw, 42px) * 1.68); height: calc(clamp(28px, 3vw, 42px) * 1.68); }
+
+
+/* === Long-name podium stability fix ===
+   Keep each podium column constrained while allowing its stone card to grow
+   vertically when a player name wraps. Artifact images remain separate above
+   the card and are not resized or repositioned by the name's line count.
+*/
+.top-three {
+    min-width: 0;
+}
+
+.podium-entry {
+    min-width: 0;
+    width: 100%;
+    align-self: stretch;
+}
+
+.player-card {
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    min-height: var(--monument-height, 152px);
+    flex: 0 0 auto;
+    box-sizing: border-box;
+}
+
+.rank-1 .player-card {
+    min-height: var(--monument-height, 208px);
+}
+
+.rank-2 .player-card {
+    min-height: var(--monument-height, 176px);
+}
+
+.rank-3 .player-card {
+    min-height: var(--monument-height, 152px);
+}
+
+.player-card > .player-name,
+.player-card > .player-score {
+    min-width: 0;
+    max-width: 100%;
+    flex: 0 1 auto;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    text-align: center;
+}
+
+.player-card > .player-name {
+    line-height: 1.15;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.player-card > .faction-logo {
+    flex: 0 0 auto;
+}
+
+.object-image {
+    flex: 0 0 auto;
+}
+
+/* Retain the original compact styling on narrow screens. */
+@media (max-width: 520px) {
+    .player-card {
+        height: auto;
+    }
+
+    .rank-1 .player-card,
+    .rank-2 .player-card,
+    .rank-3 .player-card {
+        height: auto;
+    }
+}
+
+
+/* All player names are displayed in uppercase.
+   Uppercase glyphs can be wider, so keep the name inside the card and allow
+   additional wrapping without changing the artifact dimensions. */
+.player-name {
+    text-transform: uppercase;
+    letter-spacing: 0.015em;
+    min-width: 0;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: normal;
+}
+
+.player-card > .player-name {
+    flex-shrink: 1;
+}
+
+
+/* === Keep long uppercase names from displacing side-podium house emblems === */
+/* Give second and third place a little more horizontal room. */
+.top-three {
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr) minmax(0, 1.12fr);
+}
+
+/* Anchor the side-podium emblems at a stable position instead of letting
+   multi-line names change their vertical position in the flex content stack. */
+.podium-entry.rank-2 .player-card,
+.podium-entry.rank-3 .player-card {
+    position: relative;
+}
+
+.podium-entry.rank-2 .player-card {
+    padding-top: clamp(96px, 10vw, 116px);
+}
+
+.podium-entry.rank-3 .player-card {
+    padding-top: clamp(58px, 6.5vw, 76px);
+}
+
+.podium-entry.rank-2 .player-card > .faction-logo,
+.podium-entry.rank-3 .player-card > .faction-logo {
+    position: absolute;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+}
+
+/* Slightly less side-column widening on small screens to protect first place. */
+@media (max-width: 520px) {
+    .top-three {
+        grid-template-columns: minmax(0, 1.06fr) minmax(0, 1fr) minmax(0, 1.06fr);
+    }
+
+    .podium-entry.rank-2 .player-card {
+        padding-top: 88px;
+    }
+
+    .podium-entry.rank-3 .player-card {
+        padding-top: 54px;
+    }
+
+    .podium-entry.rank-2 .player-card > .faction-logo,
+    .podium-entry.rank-3 .player-card > .faction-logo {
+        top: 14px;
+    }
+}
+
+
+
+/* === Corrective layout: widen the frame, restore natural logo flow === */
+main {
+    width: min(1280px, 98vw);
+    box-sizing: border-box;
+}
+
+.top-three {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr) minmax(0, 1fr);
+    align-items: end;
+    gap: clamp(8px, 1.6vw, 22px);
+    width: 100%;
+    min-width: 0;
+}
+
+/* Preserve the intended podium order and relative center prominence. */
+.podium-entry.rank-1 { grid-column: 2; order: 2; }
+.podium-entry.rank-2 { grid-column: 1; order: 1; }
+.podium-entry.rank-3 { grid-column: 3; order: 3; }
+
+.podium-entry {
+    width: auto;
+    min-width: 0;
+    align-self: end;
+}
+
+/* Cards may grow vertically for long names, but keep their contents in normal flow. */
+.player-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    box-sizing: border-box;
+}
+
+.podium-entry.rank-1 .player-card {
+    min-height: var(--monument-height, 208px);
+}
+
+.podium-entry.rank-2 .player-card {
+    min-height: var(--monument-height, 176px);
+}
+
+.podium-entry.rank-3 .player-card {
+    min-height: var(--monument-height, 152px);
+}
+
+/* Undo logo anchoring that caused the emblems to overlap names.
+   Logos remain in normal flow above the player name. */
+.podium-entry .player-card > .faction-logo {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    margin: 0 auto 4px;
+    flex: 0 0 auto;
+}
+
+.player-card > .player-name,
+.player-card > .player-score {
+    position: relative;
+    min-width: 0;
+    max-width: 100%;
+    flex: 0 1 auto;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    text-align: center;
+}
+
+.player-card > .player-name {
+    text-transform: uppercase;
+    line-height: 1.15;
+}
+
+/* Keep the same three-column structure on small screens without overflow. */
+@media (max-width: 520px) {
+    main {
+        width: 98vw;
+    }
+
+    .top-three {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr) minmax(0, 1fr);
+        align-items: end;
+        gap: 6px;
+    }
+
+    .podium-entry {
+        min-width: 0;
+    }
+
+    .player-card {
+        height: auto;
+    }
+
+    .podium-entry .player-card > .faction-logo {
+        position: relative;
+        top: auto;
+        left: auto;
+        transform: none;
+    }
+}
+
+
+
+/* Neutralize the earlier side-logo spacer rules; the logos now stay in flow. */
+.podium-entry.rank-2 .player-card,
+.podium-entry.rank-3 .player-card {
+    padding-top: 0;
+}
+@media (max-width: 520px) {
+    .podium-entry.rank-2 .player-card,
+    .podium-entry.rank-3 .player-card {
+        padding-top: 0;
+    }
+}
+
+/* === Center Rank 2 and Rank 3 faction emblems inside their podium cards === */
+.podium-entry.rank-2 .player-card > .faction-logo,
+.podium-entry.rank-3 .player-card > .faction-logo {
+    position: absolute;
+    left: 50%;
+    right: auto;
+    margin-left: 0;
+    margin-right: 0;
+    transform: translateX(-50%);
+    display: block;
+}
+
+@media (max-width: 520px) {
+    .podium-entry.rank-2 .player-card > .faction-logo,
+    .podium-entry.rank-3 .player-card > .faction-logo {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+    }
+}
